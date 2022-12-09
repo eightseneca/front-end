@@ -28,7 +28,23 @@ async function getAllTokensOfUser(userAddress: string): Promise<DocumentTrackerT
 async function transferTo(tokenId: number, sender: string, receiver: string) {
   const signer = Provider.getSigner();
   console.log(`Start transfer from ${sender} to ${receiver} token ${tokenId}`);
-  await DocumentTracker.connect(signer).transferFrom(sender, receiver, tokenId);
+  const tx = await DocumentTracker.connect(signer).transferFrom(sender, receiver, tokenId);
+  alert(`Transfer token success with tx ${tx.hash}`);
+}
+
+async function upload(content: string) {
+  console.log(`Start upload file`);
+  const [isFileExist, tokenId] = await DocumentTracker.contentIndex(content);
+  if (isFileExist) {
+    const tokenInfo = await DocumentTracker.trackers(tokenId);
+    const currentOwner = await DocumentTracker.ownerOf(tokenId);
+    alert(`File was uploaded, org owner is ${tokenInfo.orgOwner}, and current owner is ${currentOwner}`);
+  } else {
+    console.log(`Start uploading file`);
+    const signer = Provider.getSigner();
+    const tx = await DocumentTracker.connect(signer).mint(content);
+    alert(`Upload success with tx ${tx.hash}`);
+  }
 }
 
 function App() {
@@ -85,12 +101,6 @@ function App() {
     setUploadIsOpen(false);
   }
 
-
-  // const signer = Provider.getSigner();
-  // const content = Buffer.from("This is file B");
-  // DocumentTracker.connect(signer).mint(ethers.utils.keccak256(content)).then((result) => console.log(`Mint success result is ${result}`))
-  //   .catch((error) => console.log(`Mint failed, result is ${error}`));
-
   return (
     <div className="App">
       <Modal
@@ -123,7 +133,7 @@ function App() {
           // @ts-ignore
           reader.readAsText(event.target.files[0]);
         }}/>
-        <button onClick={() => { console.log(fileContentUpload)}}>Upload</button>
+        <button onClick={() => upload(fileContentUpload)}>Upload</button>
       </Modal>
 
       <header className="App-header">
