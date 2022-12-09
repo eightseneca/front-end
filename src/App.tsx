@@ -42,6 +42,8 @@ function App() {
   const [addressTransferInput, setAddressTransferInput] = useState('');
   const [nftUsed, setNftUsed] = useState<number>(-1);
 
+  const [fileContentUpload, setFileContentUpload] = useState('');
+
   useEffect(() => {
     ethereum.request({ method: 'eth_requestAccounts'})
       .then((result) => {
@@ -69,18 +71,19 @@ function App() {
 
   const [modalIsOpen, setIsOpen] = React.useState(false);
 
-  function openModal() {
-    setIsOpen(true);
-  }
-
-  function afterOpenModal() {
-    // references are now sync'd and can be accessed.
-  }
+  const [uploadIsOpen, setUploadIsOpen] = useState(false);
 
   function closeModal() {
     setIsOpen(false);
   }
 
+  function openUpload() {
+    setUploadIsOpen(true);
+  }
+
+  function closeUpload() {
+    setUploadIsOpen(false);
+  }
 
 
   // const signer = Provider.getSigner();
@@ -92,16 +95,39 @@ function App() {
     <div className="App">
       <Modal
         isOpen={modalIsOpen}
-        onAfterOpen={afterOpenModal}
         onRequestClose={closeModal}
-        contentLabel="Example Modal"
+        contentLabel="Transfer token"
       >
         <button onClick={closeModal}>close</button>
         <div>Address you want to transfer</div>
           <input onChange={(event) => setAddressTransferInput(event.target.value)}/>
           <button onClick={() => transferTo(nftUsed, account, addressTransferInput)}>Confirm Transfer</button>
       </Modal>
+
+      <Modal
+        isOpen={uploadIsOpen}
+        onRequestClose={closeUpload}
+        contentLabel="Upload file"
+      >
+        <button onClick={closeUpload}>close</button>
+        <div>File you want to upload</div>
+        <input type='file' onChange={async (event) => {
+          event.preventDefault();
+          const reader = new FileReader();
+          reader.onload = async (event) => {
+            // @ts-ignore
+            const text = (event.target.result);
+            // @ts-ignore
+            setFileContentUpload(ethers.utils.keccak256(Buffer.from(text)));
+          }
+          // @ts-ignore
+          reader.readAsText(event.target.files[0]);
+        }}/>
+        <button onClick={() => { console.log(fileContentUpload)}}>Upload</button>
+      </Modal>
+
       <header className="App-header">
+        <button onClick={openUpload}>Upload file content</button>
         <img src={logo} className="App-logo" alt="logo" />
         <p>
           Account of user is <b>{ account }</b>
