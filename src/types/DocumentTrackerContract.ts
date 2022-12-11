@@ -25,7 +25,7 @@ import type {
   TypedListener,
   OnEvent,
   PromiseOrValue,
-} from "./common";
+} from "../../common";
 
 export interface DocumentTrackerContractInterface extends utils.Interface {
   functions: {
@@ -529,7 +529,13 @@ export interface DocumentTrackerContract extends BaseContract {
     trackers(
       arg0: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
-    ): Promise<[string, string] & { hashContent: string; orgOwner: string }>;
+    ): Promise<
+      [string, string, BigNumber] & {
+        hashContent: string;
+        orgOwner: string;
+        createdTime: BigNumber;
+      }
+    >;
 
     transferFrom(
       from: PromiseOrValue<string>,
@@ -664,7 +670,13 @@ export interface DocumentTrackerContract extends BaseContract {
   trackers(
     arg0: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
-  ): Promise<[string, string] & { hashContent: string; orgOwner: string }>;
+  ): Promise<
+    [string, string, BigNumber] & {
+      hashContent: string;
+      orgOwner: string;
+      createdTime: BigNumber;
+    }
+  >;
 
   transferFrom(
     from: PromiseOrValue<string>,
@@ -797,7 +809,13 @@ export interface DocumentTrackerContract extends BaseContract {
     trackers(
       arg0: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
-    ): Promise<[string, string] & { hashContent: string; orgOwner: string }>;
+    ): Promise<
+      [string, string, BigNumber] & {
+        hashContent: string;
+        orgOwner: string;
+        createdTime: BigNumber;
+      }
+    >;
 
     transferFrom(
       from: PromiseOrValue<string>,

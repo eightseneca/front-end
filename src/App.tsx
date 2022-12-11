@@ -10,7 +10,7 @@ interface DocumentTrackerToken {
   hashContent: string;
   orgOwner: string;
   tokenId: number;
-
+  createdTime: ethers.BigNumber;
 }
 async function getAllTokensOfUser(userAddress: string): Promise<DocumentTrackerToken[]> {
   const balance = (await DocumentTracker.balanceOf(userAddress)).toNumber();
@@ -38,7 +38,7 @@ async function upload(content: string) {
   if (isFileExist) {
     const tokenInfo = await DocumentTracker.trackers(tokenId);
     const currentOwner = await DocumentTracker.ownerOf(tokenId);
-    alert(`File was uploaded, org owner is ${tokenInfo.orgOwner}, and current owner is ${currentOwner}`);
+    alert(`File was uploaded at ${tokenInfo.createdTime.toNumber()}, org owner is ${tokenInfo.orgOwner}, and current owner is ${currentOwner}`);
   } else {
     console.log(`Start uploading file`);
     const signer = Provider.getSigner();
