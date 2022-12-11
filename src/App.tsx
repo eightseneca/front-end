@@ -47,6 +47,18 @@ async function upload(content: string) {
   }
 }
 
+async function check(content: string) {
+  console.log(`Start upload file`);
+  const [isFileExist, tokenId] = await DocumentTracker.contentIndex(content);
+  if (isFileExist) {
+    const tokenInfo = await DocumentTracker.trackers(tokenId);
+    const currentOwner = await DocumentTracker.ownerOf(tokenId);
+    alert(`File was uploaded at ${tokenInfo.createdTime.toNumber()}, org owner is ${tokenInfo.orgOwner}, and current owner is ${currentOwner}`);
+  } else {
+    alert(`File is not found in system`);
+  }
+}
+
 function App() {
 
   // @ts-ignore
@@ -59,6 +71,7 @@ function App() {
   const [nftUsed, setNftUsed] = useState<number>(-1);
 
   const [fileContentUpload, setFileContentUpload] = useState('');
+  const [fileContentCheck, setFileContentCheck] = useState('');
 
   useEffect(() => {
     ethereum.request({ method: 'eth_requestAccounts'})
@@ -89,6 +102,8 @@ function App() {
 
   const [uploadIsOpen, setUploadIsOpen] = useState(false);
 
+  const [checkIsOpen, setCheckIsOpen] = useState(false);
+
   function closeModal() {
     setIsOpen(false);
   }
@@ -99,6 +114,14 @@ function App() {
 
   function closeUpload() {
     setUploadIsOpen(false);
+  }
+
+  function openCheck() {
+    setCheckIsOpen(true);
+  }
+
+  function closeCheck() {
+    setCheckIsOpen(false);
   }
 
   return (
@@ -112,6 +135,28 @@ function App() {
         <div>Address you want to transfer</div>
           <input onChange={(event) => setAddressTransferInput(event.target.value)}/>
           <button onClick={() => transferTo(nftUsed, account, addressTransferInput)}>Confirm Transfer</button>
+      </Modal>
+
+      <Modal
+        isOpen={checkIsOpen}
+        onRequestClose={closeCheck}
+        contentLabel="Upload file"
+      >
+        <button onClick={closeCheck}>close</button>
+        <div>File you want to check</div>
+        <input type='file' onChange={async (event) => {
+          event.preventDefault();
+          const reader = new FileReader();
+          reader.onload = async (event) => {
+            // @ts-ignore
+            const text = (event.target.result);
+            // @ts-ignore
+            setFileContentCheck(ethers.utils.keccak256(Buffer.from(text)));
+          }
+          // @ts-ignore
+          reader.readAsText(event.target.files[0]);
+        }}/>
+        <button onClick={() => check(fileContentCheck)}>Check</button>
       </Modal>
 
       <Modal
@@ -137,6 +182,7 @@ function App() {
       </Modal>
 
       <header className="App-header">
+        <button onClick={openCheck}>Check file content</button>
         <button onClick={openUpload}>Upload file content</button>
         <img src={logo} className="App-logo" alt="logo" />
         <p>
