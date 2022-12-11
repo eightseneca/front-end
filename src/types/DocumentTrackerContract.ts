@@ -25,7 +25,7 @@ import type {
   TypedListener,
   OnEvent,
   PromiseOrValue,
-} from "../../common";
+} from "./common";
 
 export interface DocumentTrackerContractInterface extends utils.Interface {
   functions: {
